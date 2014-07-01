@@ -1,6 +1,6 @@
+# Version 0.1 01/06/2014
 # add #rpsls
 # in case of failed dm make sure written grif ref file captures this
-# Instead of waiting to hit forbidden when using DM use followers list
 
 rm(list=ls())
 
