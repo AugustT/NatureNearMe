@@ -1,6 +1,6 @@
 ###Get grid reference requests###
 #Returns text and inReplyTo##
-gridRefTweets <- function(tweets = NULL, followers=NULL){
+gridRefTweets <- function(tweets = NULL){
   
   load("twitteR_credentials") # load credentials
   if(!registerTwitterOAuth(Cred)) stop('login failed') # Check login
@@ -30,7 +30,7 @@ gridRefTweets <- function(tweets = NULL, followers=NULL){
     tweets <- tweets[,c('replyText', 'id', 'screenName', 'created')]
     
     # Reply to gridRefTweets
-    replyGR(tweets, followers)
+    replyGR(tweets)
   }
   
   return(tweets)

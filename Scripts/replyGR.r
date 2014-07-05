@@ -1,5 +1,5 @@
 ## send replies regarding grid references
-replyGR <- function(repliesGR=NULL, followers = followers){
+replyGR <- function(repliesGR=NULL){
     
   if(!is.null(repliesGR)){
     # Save replies
@@ -10,7 +10,6 @@ replyGR <- function(repliesGR=NULL, followers = followers){
     }
     for(i in 1:nrow(repliesGR)){
       #sink(file='dump')
-      dm_resp <- try(dmSend(text=repliesGR$replyText[i], user = repliesGR$screenName[i]), silent = TRUE)
       
       error <- try(updateStatus(text = paste("@", tweets$screenName[i], ' ', repliesGR$replyText[i], sep = ''),
                                 inReplyTo=repliesGR$id[i]), silent = TRUE)      

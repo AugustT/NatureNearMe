@@ -4,13 +4,16 @@
 
 rm(list=ls())
 
+# install development packages
+#install_github('rnbn','JNCC-UK')
+#install_github('twitteR','geoffjentry')
+
 # Load libraries and data
 library(gdata)
 library(twitteR)
 library(plyr)
 library(devtools)
 library(sp)
-#install_github('rnbn','JNCC-UK')
 library(rnbn)
 load('datum_vars.rdata')
 load('helmert_trans_vars.rdata')
@@ -26,16 +29,19 @@ sinceID <- attr(getTweets(sinceID=NULL), 'max_sinceID')
 # get the since id for direct messages
 dms <- dmGet(sinceID = NULL)
 sinceID_cmd <- dms[[1]]$id
+
 # manually login to the nbn
-# change this once bug fixed
-nbnLogin()
+nbnLogin(username = 'tom_test', password = 'HelloWorld')
+
+# If we exit the loop send me a message
+on.exit(try(dmSend(text='@NatureNearMe has quit', user = 'TomAugust85'), silent = TRUE))
 
 while(end == FALSE){
   
   a <- 1
   commandsSinceID <- sinceID
-  myFriendships <- getFollowers(user = 'NatureNearMe')
-  followers <- myFriendships$screen_name
+#   myFriendships <- getFollowers(user = 'NatureNearMe')
+#   followers <- myFriendships$screen_name
   
   while(a < 20){
     
@@ -55,13 +61,13 @@ while(end == FALSE){
       }
       
       # Create grid reference replies
-      repliesGR <- gridRefTweets(tweets=tweets, followers=followers) 
+      repliesGR <- gridRefTweets(tweets=tweets) 
       
       # Create and make map replies
       maptwts <- mapTweets(tweets)
       
       # Create and make naturenearme replies
-      nearbytwts <- nearbyNature(tweets, followers=followers)
+      nearbytwts <- nearbyNature(tweets)
       
       # Directions to nearest
       dirtwts <- directionTweets(tweets)
@@ -80,6 +86,3 @@ while(end == FALSE){
   sinceID_cmd <- getCommands(sinceID = sinceID_cmd)
   
 }
-
-# If we exit the loop send me a message
-# dm_resp <- try(dmSend(text='@NatureNearMe has quit', user = 'TomAugust85'), silent = TRUE)

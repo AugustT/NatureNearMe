@@ -1,4 +1,4 @@
-nearbyNature <- function(tweets = NULL, followers = NULL){
+nearbyNature <- function(tweets = NULL){
 
   load("twitteR_credentials") # load credentials
   if(!registerTwitterOAuth(Cred)) stop('login failed') # Check login
@@ -126,17 +126,20 @@ nearbyNature <- function(tweets = NULL, followers = NULL){
     
     for(i in 1:nrow(tweets)){
       #sink(file='dump')
-      if(tweets$screenName[i] %in% followers){
-        dm_resp <- try(dmSend(text=tweets$replyText[i], user = tweets$screenName[i]), silent = TRUE)
-      } else {
-        error <- try(updateStatus(text = paste("@", tweets$screenName[i], ' Responses to #NatureNearMe are sent via direct message, please follow @NatureNearMe and then send your message again', sep = ''), inReplyTo=tweets$id[i]), silent = TRUE)
-        tweets$replyText[i] <- 'Responses to #NatureNearMe are sent via direct message, please follow @NatureNearMe and then send your message again'
-        if(class(error) == 'try-error'){
-          cat('Trying naturenearme again\n')
-          Sys.sleep(10)
-          error<- try(updateStatus(text = paste("@", tweets$screenName[i], ' Responses to #NatureNearMe are sent via direct message, please follow @NatureNearMe and then send your message again', sep = ''), inReplyTo=tweets$id[i]), silent = TRUE)        
-        }        
-      }
+      error <- try(updateStatus(text = paste("@", tweets$screenName[i], ' ', tweets$replyText[i], sep = ''),
+                                inReplyTo=tweets$id[i]), silent = TRUE)   
+      
+#       if(tweets$screenName[i] %in% followers){
+#         dm_resp <- try(dmSend(text=tweets$replyText[i], user = tweets$screenName[i]), silent = TRUE)
+#       } else {
+#         error <- try(updateStatus(text = paste("@", tweets$screenName[i], ' Responses to #NatureNearMe are sent via direct message, please follow @NatureNearMe and then send your message again', sep = ''), inReplyTo=tweets$id[i]), silent = TRUE)
+#         tweets$replyText[i] <- 'Responses to #NatureNearMe are sent via direct message, please follow @NatureNearMe and then send your message again'
+#         if(class(error) == 'try-error'){
+#           cat('Trying naturenearme again\n')
+#           Sys.sleep(10)
+#           error<- try(updateStatus(text = paste("@", tweets$screenName[i], ' Responses to #NatureNearMe are sent via direct message, please follow @NatureNearMe and then send your message again', sep = ''), inReplyTo=tweets$id[i]), silent = TRUE)        
+#         }        
+#      }
       #sink()
     }
     
