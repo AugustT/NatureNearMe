@@ -29,7 +29,7 @@ mapTweets <- function(tweets = NULL){
     }
     
     # Create URL to view
-    tweets$mapURL <- paste('https://gis.nbn.org.uk/SingleSpecies/', tweets$ptaxonVersionKey, '/atlas/circle/map', sep = '')
+    tweets$mapURL <- paste('https://data.nbn.org.uk/imt/?mode=SPECIES&species=', tweets$ptaxonVersionKey, sep = '')
     tweets$maptext <- NA
     
     for(i in 1:nrow(tweets)){  

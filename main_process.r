@@ -1,88 +1,34 @@
-# Version 0.1 01/06/2014
-# add #rpsls
-# in case of failed dm make sure written grif ref file captures this
-
+# Version 0.1.1 05/06/2014
 rm(list=ls())
 
-# install development packages
-#install_github('rnbn','JNCC-UK')
-#install_github('twitteR','geoffjentry')
-
-# Load libraries and data
-library(gdata)
-library(twitteR)
-library(plyr)
-library(devtools)
-library(sp)
-library(rnbn)
-load('datum_vars.rdata')
-load('helmert_trans_vars.rdata')
-# Source all functions
-for (nm in list.files('Scripts')){
-  source(file.path('Scripts', nm))
-}
-
-# end keeps the loop going
-end <- FALSE
-# get the ID of the latest record
-sinceID <- attr(getTweets(sinceID=NULL), 'max_sinceID')
-# get the since id for direct messages
-dms <- dmGet(sinceID = NULL)
-sinceID_cmd <- dms[[1]]$id
-
-# manually login to the nbn
-nbnLogin(username = 'tom_test', password = 'HelloWorld')
-
-# If we exit the loop send me a message
+# If we exit this script send me a message
 on.exit(try(dmSend(text='@NatureNearMe has quit', user = 'TomAugust85'), silent = TRUE))
 
+# loads packages and scripts and gets sinceIDs
+source('Scripts/setup.r')
+sIDs <- setup()
+sinceID <- sIDs$sinceID
+sinceID_cmd <- sIDs$sinceID_cmd
+datum_vars <- sIDs$datum_vars
+helmert_trans_vars <- sIDs$helmert_trans_vars
+
+# Setup an infinite loop
+end <- FALSE
 while(end == FALSE){
   
-  a <- 1
-  commandsSinceID <- sinceID
-#   myFriendships <- getFollowers(user = 'NatureNearMe')
-#   followers <- myFriendships$screen_name
-  
-  while(a < 20){
-    
-    # Get tweets  
-    tweets <- getTweets(sinceID=sinceID)
-    #save(tweets, file='tweets')
-    #load(file='tweets')
-    print(tweets$text)
-    
-    if(!is.null(tweets)){
-      
-      # Save tweets to file
-      if(file.exists('tweets.csv')){
-        write.table(x = tweets, file = 'tweets.csv', row.names = FALSE, col.names = FALSE, append = TRUE, sep=',')
-      } else {
-        write.table(x = tweets, file = 'tweets.csv', row.names = FALSE, col.names = TRUE, append = TRUE, sep=',')
-      }
-      
-      # Create grid reference replies
-      repliesGR <- gridRefTweets(tweets=tweets) 
-      
-      # Create and make map replies
-      maptwts <- mapTweets(tweets)
-      
-      # Create and make naturenearme replies
-      nearbytwts <- nearbyNature(tweets)
-      
-      # Directions to nearest
-      dirtwts <- directionTweets(tweets)
-      
-      # Record sinceID we got up to
-      sinceID <- attr(tweets, 'max_sinceID')
+  for(i in 1:20){
+    sinceID <- try(runInteractions(sinceID), silent = TRUE)
+    if(class(sinceID) == 'try-error'){ #if we have an error record it and tell me about it
+      try(dmSend(text=paste('@NatureNearMe interactions error at', Sys.time()), user = 'TomAugust85'), silent = TRUE)
+      print(paste(Sys.time(), sinceID))
     }
-    
-    # Wait for 5.5 seconds, this keeps us under the rate limit
-    Sys.sleep(5.5)
-    a=a+1
   }
   
   # Get dm and look for commands
   cat('checking for commands\n')
-  sinceID_cmd <- getCommands(sinceID = sinceID_cmd)
-  
+  sinceID_cmd <- try(getCommands(sinceID = sinceID_cmd), silent = TRUE)
+  if(class(sinceID_cmd) == 'try-error'){ #if we have an error record it and tell me about it
+    try(dmSend(text=paste('@NatureNearMe commands error at', Sys.time()), user = 'TomAugust85'), silent = TRUE)
+    print(paste(Sys.time(), sinceID_cmd))
+  }
 }
