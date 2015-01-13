@@ -14,7 +14,7 @@ runInteractions <- function(sinceID = NULL){
     }
     
     # manually login to the nbn
-    nbnLogin(username = 'tom_test', password = 'HelloWorld')
+    nbnLogin(username = 'USERNAME', password = 'PASSWORD')
     
     # Create grid reference replies
     repliesGR <- gridRefTweets(tweets=tweets) 
